@@ -214,7 +214,7 @@ public class Figure implements Serializable
     {
         this.color = color;
     }
-
+    
     /**
      * Change the width of the figure
      *
@@ -306,5 +306,17 @@ public class Figure implements Serializable
     public String toString()
     {
         return shape.getName() + " " + rect;
+    }
+
+    public static int getLAST_ID() {
+        return LAST_ID;
+    }
+
+    public Shape getShape() {
+        return shape;
+    }
+
+    public Rectangle2D getRect() {
+        return rect;
     }
 }

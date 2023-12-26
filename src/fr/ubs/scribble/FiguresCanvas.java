@@ -1,11 +1,13 @@
 package fr.ubs.scribble;
 
 import fr.ubs.scribble.shapes.Shape;
+import fr.ubs.scribbleOnline.ScribbleClient;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.geom.Rectangle2D;
+import java.rmi.RemoteException;
 
 /**
  * A canvas used to draw figures, composed of a list of figures and a figure currently drawing
@@ -87,6 +89,10 @@ public class FiguresCanvas extends JPanel implements MouseMotionListener, MouseL
      * the figures currently drawn on the canvas
      */
     private final Figures figures;
+
+    public Figures getFigures() {
+        return figures;
+    }
 
     /**
      * the figure from the list of figures that is selected (may be null)
@@ -170,15 +176,17 @@ public class FiguresCanvas extends JPanel implements MouseMotionListener, MouseL
      */
     private double ty;
 
+    ScribbleClient client;
     /**
      * Constructor
+     * @throws RemoteException
      */
-    public FiguresCanvas()
+    public FiguresCanvas(ScribbleClient client_) throws RemoteException
     {
         setPreferredSize(new Dimension(WIDTH, HEIGHT));
         setBackground(Color.WHITE);
-
-        this.figures = new Figures();
+        this.client = client_;
+        this.figures = client.getFiguresBox().getFigures();
 
         // register listeners
         addMouseListener(this);
@@ -240,6 +248,12 @@ public class FiguresCanvas extends JPanel implements MouseMotionListener, MouseL
         if (this.selectedFigure != null) {
             this.selectedFigure.setColor(color);
             // !!! the figure color has been updated
+            try {
+                this.client.getFiguresBox().updateFigure(selectedFigure);
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             repaint();
         }
         requestFocusInWindow();
@@ -285,9 +299,21 @@ public class FiguresCanvas extends JPanel implements MouseMotionListener, MouseL
                 Figure selectedFigure = figures.addCurrentFigure();
                 select(selectedFigure, x, y);
                 // !!! the figure has been added
+                try {
+                    this.client.getFiguresBox().addFigure(selectedFigure);
+                } catch (RemoteException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             } else if (selectedFigure != null) {
                 selectedFigure.update();
                 // !!! the figure location or size has been updated
+                try {
+                    this.client.getFiguresBox().updateFigure(selectedFigure);
+                } catch (RemoteException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         } else { // select the figure at the mouse location or deselect the currently selected figure
             Figure selectedFigure = figures.getFigureAt(x, y);
@@ -458,6 +484,12 @@ public class FiguresCanvas extends JPanel implements MouseMotionListener, MouseL
         if (event.getKeyCode() == KeyEvent.VK_DELETE && this.selectedFigure != null) {
             figures.remove(this.selectedFigure);
             // !!! the figure has been removed
+            try {
+                this.client.getFiguresBox().removeFigure(this.selectedFigure);
+            } catch (RemoteException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             this.selectedFigure = null;
             repaint();
         }
@@ -484,6 +516,7 @@ public class FiguresCanvas extends JPanel implements MouseMotionListener, MouseL
         if (this.selectedFigure != null && this.selectedFigure.getId() == figure.getId()) {
             this.selectedFigure.setSelected(false);
             this.selectedFigure = null;
+            System.out.println("Figure :"+ figure.getId()+" unselected");
         }
     }
 

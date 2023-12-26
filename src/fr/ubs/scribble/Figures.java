@@ -50,6 +50,8 @@ public class Figures extends ArrayList<Figure>
     {
         this.currentFigure = new Figure(shape, color, x, y);
     }
+   
+    
 
     /**
      * Resize the currently drawing figure, if any

@@ -6,6 +6,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.RemoteServer;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.List;
 
 
 
@@ -15,14 +16,16 @@ public class ScribbleServeur extends RemoteServer{
     private FiguresBox figuresBox;
     private Remote stub;
     private Registry registry;
-    public static void main(String[] args) {
+    private List<Callback> callbacks;
+    public static void main(String[] args) throws NumberFormatException, RemoteException {
         testlaunch(args);
 
     }
-    public static void testlaunch(String[] args){
+    public static void testlaunch(String[] args) throws NumberFormatException, RemoteException{
         if (args.length != 1 || args[0].equals("-h") || args[0].equals("--help") || !args[0].matches("[0-9]+")) {
             printUsage();   
         }
+        ScribbleServeur serveur = new ScribbleServeur(Integer.parseInt(args[0]));
     }
     public ScribbleServeur(int port) throws RemoteException{
         this.port = port;

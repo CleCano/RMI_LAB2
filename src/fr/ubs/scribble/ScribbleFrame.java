@@ -1,6 +1,7 @@
 package fr.ubs.scribble;
 
 import fr.ubs.scribble.shapes.Shape;
+import fr.ubs.scribbleOnline.ScribbleClient;
 
 import javax.swing.*;
 import java.awt.*;
@@ -37,7 +38,7 @@ public class ScribbleFrame extends JFrame
             public void run()
             {
                 try {
-                    ScribbleFrame frame = new ScribbleFrame();
+                    ScribbleFrame frame = new ScribbleFrame(null);
                     frame.pack();
                     frame.setVisible(true);
                 } catch (Exception e) {
@@ -52,14 +53,15 @@ public class ScribbleFrame extends JFrame
      * 
      * @throws Exception if any error occurs while constructing the frame
      */
-    public ScribbleFrame() throws Exception
+    public ScribbleFrame(ScribbleClient client) throws Exception
     {
         super("Scribble Pad");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
         setBackground(Color.WHITE);
         setLayout(new BorderLayout(5, 5));
-        FiguresCanvas canvas = new FiguresCanvas();
+        FiguresCanvas canvas = new FiguresCanvas(client);
+        client.setCanvas(canvas);
         add(makeToolbar(canvas), BorderLayout.NORTH);
         add(canvas, BorderLayout.CENTER);
     }
